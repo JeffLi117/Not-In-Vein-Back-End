@@ -3,10 +3,10 @@ const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/
 require('dotenv').config();
 const brevo = require('@getbrevo/brevo');
 // delete this before pushing it
-const serviceAccount = require('./not-in-vein-firebase-adminsdk-6wc6q-5db000729a.json');
+
 
 const app = initializeApp({
-    credential: cert(serviceAccount),
+    credential: cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
 });
 
 const db = getFirestore();

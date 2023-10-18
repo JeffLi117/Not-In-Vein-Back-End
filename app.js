@@ -1,9 +1,10 @@
 const { initializeApp, applicationDefault, cert, getApps } = require('firebase-admin/app');
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
-require('dotenv').config();
-const brevo = require('@getbrevo/brevo');
-// delete this before pushing it
+var isFuture = require('date-fns/isFuture');
+var differenceInCalendarDays = require('date-fns/differenceInCalendarDays');
+var cron = require('node-cron');
 
+require('dotenv').config();
 
 const app = initializeApp({
     credential: cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
@@ -16,46 +17,18 @@ const apiKey = process.env.SENDGRID_API_KEY;
 sgMail.setApiKey(apiKey);
 const msg = {
     to: '',
-    from: 'tomomi.n.kosaka@gmail.com', // Use the email address or domain you verified above
-    subject: 'Sending with Twilio SendGrid is Fun by Tomomi for Test',
+    from: 'not.in.vein.email@gmail.com', // Use the email address or domain you verified above
+    subject: 'Sending with Twilio SendGrid is easy - using new email',
     text: 'this is test to see if SendGrid is working',
     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-  };
-
-
-
-// let defaultClient = brevo.ApiClient.instance;
-
-// let apiKey = defaultClient.authentications['api-key'];
-// apiKey.apiKey = process.env.API_KEY;
-
-// let partnerKey = defaultClient.authentications['partner-key'];
-// partnerKey.apiKey = process.env.API_KEY;
-
-// let apiInstance = new brevo.TransactionalEmailsApi();
-// let sendSmtpEmail = new brevo.SendSmtpEmail();
-
-// sendSmtpEmail.subject = "My {{params.subject}}";
-// sendSmtpEmail.htmlContent = "<html><body><h1>Common: This is my first transactional email {{params.parameter}}</h1></body></html>";
-// sendSmtpEmail.sender = { "name": "Jeffrey Li - Not In Vein", "email": "jeffrey.t.li.work@gmail.com" };
-// sendSmtpEmail.to = [
-//   { "email": "{{params.EMAIL}}", "name": "{{params.FULLNAME}}" }
-// ];
-// sendSmtpEmail.replyTo = { "email": "example@brevo.com", "name": "sample-name" };
-// sendSmtpEmail.headers = { "Some-Custom-Name": "unique-id-1234" };
-// sendSmtpEmail.params = { "parameter": "TESTING", "subject": "Testing subject" };
+};
 
 const testFunction = async () => {
-    const userRef = db.collection('users').doc('0cse2xite0MLhgYks2K8dJp4XK32');
+    const userRef = db.collection('users').doc('E78EcPxRktbGacyZN4gd65vFCCZ2');
     const doc = await userRef.get();
     if (!doc.exists) {
         console.log('No such document!');
     } else {
-        // console.log('Document data:', doc.data());
-        // console.log(sendSmtpEmail.params);
-        // sendSmtpEmail.params['EMAIL'] = doc.data().email;
-        // sendSmtpEmail.params['FULLNAME'] = doc.data().name;
-        // console.log(`sendSmtpEmail:`, sendSmtpEmail);
         msg.to = doc.data().email;
         console.log(msg);
         sgMail
@@ -70,22 +43,30 @@ const testFunction = async () => {
     }
 }
 
-testFunction();
+const sendUpcomingReminder = async () => {
+    const userRef = db.collection('users').doc('E78EcPxRktbGacyZN4gd65vFCCZ2');
+    const doc = await userRef.get();
+    const today = new Date();
+    if (!doc.exists) {
+        console.log('No such document!');
+    } else {
+        const convertedDate = doc.data().upcomingDonation.toDate();
+        if (isFuture(convertedDate) && isSevenAway(convertedDate, today)) {
+            testFunction();
+        }
+    }
+}
+
+const isSevenAway = (upcomingDate, todayDate) => {
+    if (differenceInCalendarDays(upcomingDate, todayDate) == 7) {
+        return true
+    } 
+}
 
 
+cron.schedule('*/1 * * * *', () => {
+    console.log('running a task every 1 minute');
+    sendUpcomingReminder();
+});
 
-
-  //ES6
-
-  
-
-// testFunction()
-//     .then(() => {
-//         console.log(sendSmtpEmail.params);
-//         // send the info
-//         apiInstance.sendTransacEmail(sendSmtpEmail).then(function (data) {
-//             console.log('API called successfully. Returned data: ' + JSON.stringify(data));
-//         }, function (error) {
-//             console.error(error);
-//         });
-//     })
+// testFunction();

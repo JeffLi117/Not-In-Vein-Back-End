@@ -1,3 +1,5 @@
 .env
-
+sendgrid.env
 node_modules
+
+not-in-vein-firebase-adminsdk-6wc6q-5db000729a.json

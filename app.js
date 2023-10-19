@@ -24,7 +24,7 @@ const msg = {
 };
 
 const testFunction = async () => {
-    const userRef = db.collection('users').doc('E78EcPxRktbGacyZN4gd65vFCCZ2');
+    const userRef = db.collection('users').doc('0cse2xite0MLhgYks2K8dJp4XK32');
     const doc = await userRef.get();
     if (!doc.exists) {
         console.log('No such document!');
@@ -44,7 +44,7 @@ const testFunction = async () => {
 }
 
 const sendUpcomingReminder = async () => {
-    const userRef = db.collection('users').doc('E78EcPxRktbGacyZN4gd65vFCCZ2');
+    const userRef = db.collection('users').doc('0cse2xite0MLhgYks2K8dJp4XK32');
     const doc = await userRef.get();
     const today = new Date();
     if (!doc.exists) {
@@ -63,11 +63,11 @@ const isSevenAway = (upcomingDate, todayDate) => {
     } 
 }
 
-sendUpcomingReminder();
+// sendUpcomingReminder();
 
-// cron.schedule('*/1 * * * *', () => {
-//     console.log('running a task every 1 minute');
-//     sendUpcomingReminder();
-// });
+cron.schedule('*/1 * * * *', () => {
+    console.log('running a task every 1 minute');
+    sendUpcomingReminder();
+});
 
 // testFunction();

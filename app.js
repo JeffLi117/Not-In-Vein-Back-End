@@ -2,7 +2,7 @@ const { initializeApp, applicationDefault, cert, getApps } = require('firebase-a
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 var isFuture = require('date-fns/isFuture');
 var differenceInCalendarDays = require('date-fns/differenceInCalendarDays');
-// var cron = require('node-cron');
+var cron = require('node-cron');
 
 require('dotenv').config();
 

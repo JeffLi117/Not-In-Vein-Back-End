@@ -100,8 +100,8 @@ const isSevenAway = (upcomingDate, todayDate) => {
 //     sendUpcomingReminder();
 // });
 
-cron.schedule('0 10 * * *', () => {
-    console.log('Running a job at 10:00 at America/Sao_Paulo timezone (which should be 08:00 CST)');
+cron.schedule('0 14 * * *', () => {
+    console.log('Running a job at 14:00 at America/Sao_Paulo timezone (which should be 12:00 CST)');
     sendUpcomingReminder();
 }, {
     scheduled: true,

@@ -93,19 +93,19 @@ const isSevenAway = (upcomingDate, todayDate) => {
     } 
 }
 
-// sendUpcomingReminder();
+sendUpcomingReminder();
 
 // cron.schedule('* */1 * * *', () => {
 //     console.log('running a task every 1 hour');
 //     sendUpcomingReminder();
 // });
 
-cron.schedule('0 14 * * *', () => {
-    console.log('Running a job at 14:00 at America/Sao_Paulo timezone (which should be 12:00 CST)');
-    sendUpcomingReminder();
-}, {
-    scheduled: true,
-    timezone: "America/Sao_Paulo"
-});
+// cron.schedule('0 14 * * *', () => {
+//     console.log('Running a job at 14:00 at America/Sao_Paulo timezone (which should be 12:00 CST)');
+//     sendUpcomingReminder();
+// }, {
+//     scheduled: true,
+//     timezone: "America/Sao_Paulo"
+// });
 
 // testFunction();

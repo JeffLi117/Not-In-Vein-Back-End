@@ -1,13 +1,7 @@
 "use strict";
-// require('dotenv').config()
-// import dotenv from 'dotenv'
-// dotenv.config();
-/* == dependencies == */
-// const express = require('express');
 import express from 'express';
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { ddbDocClient } from "./dbclient.js";
-// const { addUser } = require('./dbclient.js');
+import { PutCommand, QueryCommand, ScanCommand  } from "@aws-sdk/lib-dynamodb";
 import { addUser } from './dbclient.js';
 import cors from 'cors';
 // const morgan = require('morgan');
@@ -35,26 +29,23 @@ app.post('/register', async (req, res)=>{
     }
 });
 
-    // const params = {
-    //     TableName: "Users",
-    //     Item: {
-    //       id: ,
-    //       name: firebaseInfo.name,
-    //       email: firebaseInfo.email,
-    //       upcomingDonation: upcomingDate,
-    //       latestDonation: latestDate,
-    //       allDonations: firebaseInfo.allDonations
-    //     },
-    //   };
-//     try {
-//         // const data = await ddbDocClient.send(new PutCommand(params));
-//         // console.log("Success - item added", data);
-//         res.send('data sent');
-//     } catch(err) {
-//         console.log('error', err);
-//     }
-// })
-
+app.get('/users/:userid', async (req, res)=>{
+  console.log(req.params.userid)
+  console.log(typeof req.params.userid)
+  try {
+    let data = await ddbDocClient.send(new QueryCommand({TableName: "users",
+    KeyConditionExpression: "userid = :userid",
+    ExpressionAttributeValues:{
+      ":userid": +req.params.userid
+    }    
+   })
+   );
+    console.log("success", data.Items);
+    res.json(data.Items);
+  } catch (err) {
+    console.log("Error", err);
+  }
+})
 
 
 /** == Handle 404 errors == */
@@ -72,9 +63,6 @@ app.use(function (err, req, res, next) {
       error: { message, status },
     });
   });
-
-
-  
 
 app.listen(PORT, function () {
   console.log(`Started on http://localhost:${PORT}`);

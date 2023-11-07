@@ -3,9 +3,14 @@ import express from 'express';
 import { ddbDocClient } from "./dbclient.js";
 import { PutCommand, QueryCommand, ScanCommand  } from "@aws-sdk/lib-dynamodb";
 import { addUser } from './dbclient.js';
+import { initializeApp, cert } from 'firebase-admin/app';
 import cors from 'cors';
 // const morgan = require('morgan');
 const PORT  = 3001;
+
+const firebaseApp = initializeApp({
+  credential: cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
+});
 
 const app = express();
 
@@ -38,8 +43,7 @@ app.get('/users/:userid', async (req, res)=>{
     ExpressionAttributeValues:{
       ":userid": +req.params.userid
     }    
-   })
-   );
+  }));
     console.log("success", data.Items);
     res.json(data.Items);
   } catch (err) {

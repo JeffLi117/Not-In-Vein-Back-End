@@ -22,9 +22,14 @@ app.use(express.json());
 app.post('/register', async (req, res)=>{
     const params = {
         TableName: "users",
-        Item: {...req.body}
-      };
-    try{
+        Item: {
+          id: req.body.uid,
+          email: req.body.email,
+          name: req.body.displayName,
+        }
+    };
+    // console.log(params.Item);
+    try {
         const data = await ddbDocClient.send(new PutCommand(params));
         console.log("Success - item added", data);
         res.json(data)
@@ -34,14 +39,14 @@ app.post('/register', async (req, res)=>{
     }
 });
 
-app.get('/users/:userid', async (req, res)=>{
-  console.log(req.params.userid)
-  console.log(typeof req.params.userid)
+app.get('/users/:id', async (req, res)=>{
+  console.log(req.params.id)
+  console.log(typeof req.params.id)
   try {
     let data = await ddbDocClient.send(new QueryCommand({TableName: "users",
-    KeyConditionExpression: "userid = :userid",
+    KeyConditionExpression: "id = :id",
     ExpressionAttributeValues:{
-      ":userid": +req.params.userid
+      ":id": req.params.id
     }    
   }));
     console.log("success", data.Items);

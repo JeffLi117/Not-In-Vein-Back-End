@@ -4,6 +4,7 @@ import { ddbDocClient } from "./dbclient.js";
 import { PutCommand, QueryCommand, ScanCommand  } from "@aws-sdk/lib-dynamodb";
 import { addUser } from './dbclient.js';
 import { initializeApp, cert } from 'firebase-admin/app';
+import { authenticateToken, userOnly } from './middleware.js';
 import cors from 'cors';
 // const morgan = require('morgan');
 const PORT  = 3001;
@@ -16,10 +17,12 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-// ===========
-
+// ==== middleware ====
+app.use(authenticateToken);
 // app.post('/', addUser);
 app.post('/register', async (req, res)=>{
+    // console.log(req.headers);
+    console.log(req.body);
     const params = {
         TableName: "users",
         Item: {
@@ -33,24 +36,28 @@ app.post('/register', async (req, res)=>{
         const data = await ddbDocClient.send(new PutCommand(params));
         console.log("Success - item added", data);
         res.json(data)
-    } catch(e){
+    } catch(e) {
         console.log(e);
         res.status(404).send(e);
     }
 });
 
-app.get('/users/:id', async (req, res)=>{
-  console.log(req.params.id)
-  console.log(typeof req.params.id)
+app.get('/users/:id', userOnly, async (req, res)=>{
+  
   try {
     let data = await ddbDocClient.send(new QueryCommand({TableName: "users",
-    KeyConditionExpression: "id = :id",
-    ExpressionAttributeValues:{
-      ":id": req.params.id
-    }    
-  }));
-    console.log("success", data.Items);
-    res.json(data.Items);
+      KeyConditionExpression: "id = :id",
+      ExpressionAttributeValues:{
+        ":id": req.params.id
+      }    
+    }));
+    if (data.Items.length === 0) {
+      console.log("data.Items lengh is 0");
+      res.send(null)
+    } else {
+      console.log("success", data.Items);
+      res.json(data.Items);
+    }
   } catch (err) {
     console.log("Error", err);
   }

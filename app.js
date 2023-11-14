@@ -41,7 +41,6 @@ app.post('/register', async (req, res)=>{
     try {
         const data = await ddbDocClient.send(new PutCommand(params));
         console.log("Success - item added", data);
-        // checkout Output of putCommand would be https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/dynamodb/command/PutItemCommand/
         res.json(data)
     } catch(e) {
         console.log(e);

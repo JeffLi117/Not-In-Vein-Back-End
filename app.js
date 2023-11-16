@@ -35,6 +35,9 @@ app.post('/register', async (req, res)=>{
           id: req.body.uid,
           email: req.body.email,
           name: req.body.displayName,
+          allDonations: [],
+          latestDonation: null,
+          upcomingDonation: null,
         },
     };
     // console.log(params.Item);

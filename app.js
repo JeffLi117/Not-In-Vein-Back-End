@@ -54,7 +54,7 @@ app.get('/users/:id', userOnly, async (req, res)=>{
       }    
     }));
     if (data.Items.length === 0) {
-      console.log("data.Items lengh is 0");
+      console.log("data.Items length is 0");
       res.send(null)
     } else {
       console.log("success", data.Items);

@@ -79,16 +79,16 @@ app.get('/users/:id', userOnly, async (req, res)=>{
 
 /* == update user info =====
    params: id (should match with current user's id)
-   receive: upcomingdate and/or latestdonation
+   receive: upcomingDonation and/or latestDonation
    returns {id, email, name, latestDonation*, upcomingDonation* (*if exists)} 
    accept upcomingDonation and/or latestDonation to add those info to DB.
 */
-app.post('/adddate/:id', userOnly, async (req, res) => {
+app.post('/adddonation/:id', userOnly, async (req, res) => {
   console.log(req.body);
-  const upcomingdate = req.body.upcomingdate;
-  const latestdonation = req.body?.latestdonation;
+  const upcomingDonation = req.body.upcomingDonation;
+  const latestDonation = req.body?.latestDonation;
 
-  if (!upcomingdate && !latestdonation) {
+  if (!upcomingDonation && !latestDonation) {
     return res.status(400).json({ error: 'No attributes to update' });
   }
 
@@ -98,11 +98,11 @@ app.post('/adddate/:id', userOnly, async (req, res) => {
       Key: {
         id: req.body.uid,
       },
-      UpdateExpression: latestdonation ? 'set upcomingDonation = :upcomingDonation, latestDonation = :latestDonation' : 'set upcomingDonation = :upcomingDonation',
-      ExpressionAttributeValues: latestdonation ? {
-        ':upcomingDonation': upcomingdate,
-        ':latestDonation': latestdonation,
-      } : {':upcomingDonation': upcomingdate},
+      UpdateExpression: latestDonation ? 'set upcomingDonation = :upcomingDonation, latestDonation = :latestDonation' : 'set upcomingDonation = :upcomingDonation',
+      ExpressionAttributeValues: latestDonation ? {
+        ':upcomingDonation': upcomingDonation,
+        ':latestDonation': latestDonation,
+      } : {':upcomingDonation': upcomingDonation},
       ReturnValues: 'ALL_NEW',
     });
 

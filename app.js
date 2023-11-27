@@ -77,7 +77,7 @@ app.get('/users/:id', userOnly, async (req, res)=>{
   }
 })
 
-/* == update user info =====
+/* == add donation dates =====
    params: id (should match with current user's id)
    receive: upcomingDonation and/or latestDonation
    returns {id, email, name, latestDonation*, upcomingDonation* (*if exists)} 
@@ -103,6 +103,40 @@ app.post('/adddonation/:id', userOnly, async (req, res) => {
         ':upcomingDonation': upcomingDonation,
         ':latestDonation': latestDonation,
       } : {':upcomingDonation': upcomingDonation},
+      ReturnValues: 'ALL_NEW',
+    });
+
+    const data = await ddbDocClient.send(command);
+    console.log('UpdateItem succeeded:', data);
+    res.json(data.Attributes);
+  } catch (error) {
+    console.error('Unable to update item:', error);
+    // res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/* == update upcoming donation dates =====
+   params: id (should match with current user's id)
+   receive: upcomingDonation
+   returns {id, email, name, latestDonation*, upcomingDonation* (*if exists)} 
+   add upcomingDonation to DB.
+*/
+app.patch('/updatedonation/:id', userOnly, async (req, res) => {
+  console.log(req.body);
+  const upcomingDonation = req.body.upcomingDonation;
+
+  if (!upcomingDonation) {
+    return res.status(400).json({ error: 'No attributes to update' });
+  }
+
+  try {
+    const command = new UpdateCommand({
+      TableName: 'users',
+      Key: {
+        id: req.params.id,
+      },
+      UpdateExpression: 'set upcomingDonation = :upcomingDonation',
+      ExpressionAttributeValues: {':upcomingDonation': upcomingDonation},
       ReturnValues: 'ALL_NEW',
     });
 

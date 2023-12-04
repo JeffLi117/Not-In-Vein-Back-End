@@ -57,7 +57,6 @@ app.post('/register', async (req, res)=>{
    search user by id and returns user's information 
 */
 app.get('/users/:id', userOnly, async (req, res)=>{
-  
   try {
     let data = await ddbDocClient.send(new QueryCommand({TableName: "users",
       KeyConditionExpression: "id = :id",
@@ -146,6 +145,41 @@ app.patch('/updatedonation/:id', userOnly, async (req, res) => {
   } catch (error) {
     console.error('Unable to update item:', error);
     // res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/* == update email notification settings =====
+   params: id (should match with current user's id)
+   receive: upcomingDonation
+   returns {id, email, name, latestDonation*, upcomingDonation* (*if exists)} 
+   add upcomingDonation to DB.
+*/
+app.patch('/updateemailsettings/:id', userOnly, async (req, res) => {
+  console.log("updateemailsettings hit, received ", req.body);
+
+  const emailSettings = req.body.emailSettings;
+
+  if (!emailSettings) {
+    return res.status(400).json({ error: 'No email setting to update' });
+  }
+
+  try {
+    const command = new UpdateCommand({
+      TableName: 'users',
+      Key: {
+        id: req.params.id,
+      },
+      UpdateExpression: 'set emailSettings = :emailSettings',
+      ExpressionAttributeValues: {':emailSettings': emailSettings},
+      ReturnValues: 'ALL_NEW',
+    });
+
+    const data = await ddbDocClient.send(command);
+    console.log('UpdateItem succeeded:', data);
+    res.json(data.Attributes);
+  } catch (error) {
+    console.error('Unable to update item:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
